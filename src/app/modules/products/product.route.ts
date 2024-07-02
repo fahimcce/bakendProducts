@@ -1,8 +1,9 @@
+// routes.ts
 import express from 'express';
-import { productControllers } from './product.controller'; // Assuming productControllers is exported correctly
+import { ProductControllers } from './product.controller';
 
 const router = express.Router();
 
-router.post('/create-product', productControllers.createProduct);
+router.post('/create-product', ProductControllers.createProduct);
 
-export const productsRoute = router;
+export const ProductsRoute = router;

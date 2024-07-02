@@ -1,15 +1,15 @@
-
-export type ProductVariant ={
+// product.interface.ts
+export type ProductVariant = {
     type: string;
     value: string;
 }
 
-export type ProductInventory ={
+export type ProductInventory = {
     quantity: number;
     inStock: boolean;
 }
 
-export type Product ={
+export type Product = {
     name: string;
     description: string;
     price: number;
