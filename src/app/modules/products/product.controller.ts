@@ -1,121 +1,145 @@
+import { Request, Response } from 'express';
+import { ProductServices } from './product.services';
+import { createProductSchema, updateProductSchema } from './product.validation';
 
-import { Request, Response } from "express";
-import { ProductServices } from "./product.services";
-import { Product } from "./product.interface";
-
-
-//1. insert a data
-export const createProduct = async (req: Request, res: Response) => {
+// Create a product
+const createProduct = async (req: Request, res: Response) => {
     try {
-        const productData: Product = req.body.product;
-        const result = await ProductServices.createProduct(productData);
+        const { error } = createProductSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message,
+            });
+        }
+
+        const productData = req.body.product;
+        const result = await ProductServices.createProductIntoDB(productData);
         res.status(200).json({
             success: true,
-            message: 'Product created successfully',
+            message: 'Product is created successfully',
             data: result,
         });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
 
-//2. Retreive all data
-export const getAllProducts = async (req: Request, res: Response) => {
+// Get all products
+const getAllProducts = async (req: Request, res: Response) => {
     try {
-        const result = await ProductServices.getAllProductsFromDb();
+        const result = await ProductServices.getAllProductsFromDB();
         res.status(200).json({
             success: true,
-            message: 'all Data Retreive successFully',
+            message: 'Products retrieved successfully',
             data: result,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
 
-//3. retrieve single data
-export const getProductById = async (req: Request, res: Response) => {
+// Get single product
+const getSingleProduct = async (req: Request, res: Response) => {
     try {
         const { productId } = req.params;
-        const result = await ProductServices.getProductByIdFromDb(productId);
+        const result = await ProductServices.getSingleProductFromDB(productId);
         res.status(200).json({
             success: true,
-            message:"Retrive data successfully",
+            message: 'One product retrieved successfully',
             data: result,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
 
-// 4.Update product
-export const updateProductById = async (req: Request, res: Response) => {
+// Update product
+const updateProduct = async (req: Request, res: Response) => {
     try {
         const { productId } = req.params;
-        const productData = req.body;
-        const result = await ProductServices.updateProductByIdFromDb(productId, productData);
+        const { error } = updateProductSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message,
+            });
+        }
+
+        const productData = req.body.product;
+        const result = await ProductServices.updateProductInDB(productId, productData);
         res.status(200).json({
             success: true,
-            message: 'Product updated successfully',
+            message: 'Product information updated successfully',
             data: result,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
 
-
-// 5.Delete product
-export const deleteProductById = async (req: Request, res: Response) => {
+// Delete product
+const deleteProduct = async (req: Request, res: Response) => {
     try {
         const { productId } = req.params;
-        const result = await ProductServices.deleteProductByIdFromDb(productId);
+        const result = await ProductServices.deleteProductFromDB(productId);
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found',
+            });
+        }
         res.status(200).json({
             success: true,
             message: 'Product deleted successfully',
             data: result,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
 
-
-//6.search product by searchTerm
-export const searchProduct = async (req: Request, res: Response) => {
+// Search product by name
+const searchProduct = async (req: Request, res: Response) => {
     try {
         const { searchTerm } = req.query;
-        const result = await ProductServices.searchProductFromDb(searchTerm as string);
+        if (!searchTerm) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search term query parameter is required',
+            });
+        }
+        const result = await ProductServices.searchProductByName(searchTerm as string);
         res.status(200).json({
             success: true,
+            message: 'Products retrieved successfully',
             data: result,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            error,
+            error: err,
         });
     }
 };
@@ -123,8 +147,8 @@ export const searchProduct = async (req: Request, res: Response) => {
 export const ProductControllers = {
     createProduct,
     getAllProducts,
-    getProductById,
-    updateProductById,
-    deleteProductById,
-    searchProduct
+    getSingleProduct,
+    updateProduct,
+    deleteProduct,
+    searchProduct,
 };
