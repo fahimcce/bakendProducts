@@ -1,27 +1,24 @@
 import { orderModel } from "./order.model";
 
 
-export const createOrder = async (orderData: Partial<any>): Promise<any> => {
-    try {
-        const order = new orderModel(orderData);
-        return await order.save();
-    } catch (error) {
-        throw new Error(`Error creating order: ${error}`);
-    }
+// Create a new order in the database
+const createOrderToDB = async (orderData: any) => {
+    const order = new orderModel(orderData);
+    return await order.save();
 };
 
-export const getAllOrders = async (): Promise<any[]> => {
-    try {
-        return await orderModel.find().exec();
-    } catch (error) {
-        throw new Error(`Error fetching orders: ${error}`);
-    }
+// Retrieve all orders from the database
+const getAllOrdersFromDB = async () => {
+    return await orderModel.find().exec();
 };
 
-export const getOrdersByEmail = async (email: string): Promise<any[]> => {
-    try {
-        return await orderModel.find({ email }).exec();
-    } catch (error) {
-        throw new Error(`Error fetching orders for email ${email}: ${error}`);
-    }
+// Retrieve orders by user email from the database
+const getOrdersByEmail = async (email: string) => {
+    return await orderModel.find({ email }).exec();
 };
+
+export const orderServices={
+    createOrderToDB,
+    getAllOrdersFromDB,
+    getOrdersByEmail
+}

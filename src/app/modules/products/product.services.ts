@@ -7,6 +7,22 @@ const createProductIntoDB = async (product: Product) => {
     const result = await productModel.create(product);
     return result;
 };
+const updateProductInventory = async (productId: string, quantity: number) => {
+    try {
+        const product = await productModel.findById(productId);
+        if (!product) {
+            throw new Error('Product not found');
+        }
+
+        // Update inventory quantity
+        product.inventory.quantity -= quantity;
+        await product.save();
+
+        return product;
+    } catch (error) {
+        throw new Error('Failed to update product inventory');
+    }
+};
 
 //2. Get all products
 const getAllProductsFromDB = async () => {
@@ -48,5 +64,6 @@ export const ProductServices = {
     getSingleProductFromDB,
     updateProductInDB,
     deleteProductFromDB,
-    searchProductByName
+    searchProductByName,
+    updateProductInventory,
 };

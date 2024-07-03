@@ -1,37 +1,75 @@
 import { Request, Response } from 'express';
+import { orderServices } from './order.services';
 import { createOrderSchema } from './order.validation';
-import { createOrder, getAllOrders, getOrdersByEmail } from './order.services';
+import { ProductServices } from '../products/product.services';
 
-export const createOrderController = async (req: Request, res: Response): Promise<void> => {
+// Create a new order
+export const orderCreate = async (req: Request, res: Response) => {
     try {
-        const { error } = createOrderSchema.validate(req.body);
+        const { email, productId, price, quantity } = req.body;
+
+        // Fetch product details from database
+        const product = await ProductServices.getSingleProductFromDB(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found',
+            });
+        }
+
+        // Validate order data
+        const { error } = createOrderSchema.validate({ email, productId, price, quantity });
         if (error) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 message: error.details[0].message,
             });
-            return;
         }
 
-        const orderData = req.body;
-        const result = await createOrder(orderData);
-        res.status(201).json({
+        // Check if sufficient quantity is available
+        if (product.inventory.quantity < quantity) {
+            return res.status(400).json({
+                success: false,
+                message: 'Insufficient stock available',
+            });
+        }
+
+        // Calculate total price based on quantity (assuming price is fixed per unit)
+        const totalPrice = product.price * quantity;
+
+        // Create order
+        const orderData = {
+            email,
+            productId,
+            price,
+            quantity,
+            totalPrice,
+            // Add more fields as needed (e.g., user information, shipping details)
+        };
+
+        const createdOrder = await orderServices.createOrderToDB(orderData);
+
+        // Update product inventory
+        await ProductServices.updateProductInventory(productId, quantity);
+
+        res.status(200).json({
             success: true,
             message: 'Order created successfully!',
-            data: result,
+            data: createdOrder,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
-            
+            err,
         });
     }
 };
 
-export const getAllOrdersController = async (req: Request, res: Response): Promise<void> => {
+// Retrieve all orders
+export const fetchAllOrders = async (_req: Request, res: Response) => {
     try {
-        const result = await getAllOrders();
+        const result = await orderServices.getAllOrdersFromDB();
         res.status(200).json({
             success: true,
             message: 'Orders fetched successfully!',
@@ -41,22 +79,23 @@ export const getAllOrdersController = async (req: Request, res: Response): Promi
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
+            error,
         });
     }
 };
 
-export const getOrdersByEmailController = async (req: Request, res: Response): Promise<void> => {
+// Retrieve orders by user email
+export const fetchOrdersByEmail = async (req: Request, res: Response) => {
     try {
         const { email } = req.query;
         if (!email) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 message: 'Email query parameter is required',
             });
-            return;
         }
 
-        const result = await getOrdersByEmail(email as string);
+        const result = await orderServices.getOrdersByEmail(email as string);
         res.status(200).json({
             success: true,
             message: 'Orders fetched successfully for user email!',
@@ -66,6 +105,13 @@ export const getOrdersByEmailController = async (req: Request, res: Response): P
         res.status(500).json({
             success: false,
             message: 'Something went wrong',
+            error,
         });
     }
+};
+
+export const orderControllers = {
+    orderCreate,
+    fetchAllOrders,
+    fetchOrdersByEmail,
 };

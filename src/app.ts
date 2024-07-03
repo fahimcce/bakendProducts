@@ -12,6 +12,6 @@ app.use(cors());
 
 // Register routes
 app.use('/api/products', ProductsRoute);
-app.use('/api/orders', orderRoutes); 
+app.use('/api/orders',orderRoutes)
 
 export default app;

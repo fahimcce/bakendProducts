@@ -1,12 +1,8 @@
 import Joi from 'joi';
 
 export const createOrderSchema = Joi.object({
-    email: Joi.string().email().required().messages({
-        'any.required': 'Email is required'
-    }),
+    email: Joi.string().email().required(),
     productId: Joi.string().required(),
-    price: Joi.number().required().messages({
-        'number.base': 'Price must be a number',
-    }),
-    quantity: Joi.number().required(),
+    price: Joi.number().required(),
+    quantity: Joi.number().required()
 });
