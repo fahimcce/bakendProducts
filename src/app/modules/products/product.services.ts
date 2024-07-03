@@ -49,8 +49,7 @@ const deleteProductFromDB = async (productId: string) => {
     return result;
 }
 
-// 6.Search products
-// Search products by name
+// 6.Search products by name
 const searchProductByName = async (searchTerm: string) => {
     const regex = new RegExp(searchTerm, 'i');  // 'i' makes it case-insensitive
     const result = await productModel.find({ name: regex });

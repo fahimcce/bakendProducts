@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post('/', ProductControllers.createProduct);
 
+// i build  a logic for skip path conflict
 router.get('/', async (req, res) => {
     const searchTerm = req.query.searchTerm as string;
     if (searchTerm) {

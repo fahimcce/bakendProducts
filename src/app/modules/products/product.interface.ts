@@ -1,4 +1,4 @@
-// product.interface.ts
+
 export type ProductVariant = {
     type: string;
     value: string;

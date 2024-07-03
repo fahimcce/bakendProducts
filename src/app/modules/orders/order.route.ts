@@ -1,10 +1,8 @@
 import express from 'express';
 import { orderControllers } from './order.controller';
-// import { StudentControllers } from './student.controller';
 
-// const router = express.Router();
 const router = express.Router();
-
+// i build  a logic for skip path conflict
 router.post('/',orderControllers.orderCreate );
 router.get('/', async (req, res) => {
     const { email } = req.query;

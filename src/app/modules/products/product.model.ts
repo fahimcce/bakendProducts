@@ -1,4 +1,4 @@
-// product.model.ts
+
 import { Schema, model } from 'mongoose';
 import { Product } from './product.interface';
 
