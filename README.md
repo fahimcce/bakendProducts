@@ -1,4 +1,4 @@
-# Peoduct & Order Management API
+# Product & Order Management API
 
 This is an Order Management API built using typescript, Node.js, Express, and MongoDB. The API allows you to create, retrieve, update, and delete products and orders. It also includes functionality to search products by name and fetch orders by user email.
 
@@ -33,6 +33,7 @@ Create a `.env` file in the root directory of your project and add the following
 NODE_ENV=development
 PORT=5000
 DATABASE_URL=mongodb+srv://fahim32:fahim1234@cluster0.wisjawo.mongodb.net/ecommerze?retryWrites=true&w=majority&appName=Cluster0
+
 
 ## Run the apps
  1.** run server.ts/js**
